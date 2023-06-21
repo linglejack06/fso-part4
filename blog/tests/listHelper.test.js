@@ -27,3 +27,18 @@ describe('total likes', () => {
     expect(result).toBe(0);
   });
 });
+describe('favorite blog', () => {
+  const blogs = [
+    { likes: 5 },
+    { likes: 2 },
+    { likes: 4 },
+  ];
+  test('finds favorite and returns it', () => {
+    const result = listHelper.favoriteBlog(blogs);
+    expect(result).toEqual({ likes: 5 });
+  });
+  test('Handles length of 0', () => {
+    const result = listHelper.favoriteBlog([]);
+    expect(result).toBe('Pass in array with atleast one blog');
+  });
+});
