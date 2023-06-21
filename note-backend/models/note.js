@@ -2,13 +2,6 @@
 /* eslint-disable no-param-reassign */
 const mongoose = require('mongoose');
 
-mongoose.set('strictQuery', false);
-
-const url = process.env.NOTE_URL;
-
-mongoose.connect(url)
-  .then(() => console.log('connected to mongoDB'))
-  .catch((error) => console.error(error.message));
 const noteSchema = new mongoose.Schema({
   content: {
     type: String,
