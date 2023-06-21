@@ -38,6 +38,33 @@ const mostBlogs = (blogs) => {
   });
   return top;
 };
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return 'Pass in array with atleast one blog';
+  }
+  const authors = [];
+  blogs.forEach((blog) => {
+    let author = authors.find((a) => a.name === blog.author);
+    if (author) {
+      author.likes += blog.likes;
+    } else {
+      author = {
+        name: blog.author,
+        likes: blog.likes,
+      };
+      authors.push(author);
+    }
+  });
+  let top = authors[0];
+
+  authors.forEach((author) => {
+    if (top.likes < author.likes) {
+      top = author;
+    }
+  });
+  return top;
+};
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs,
+  dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes,
 };
