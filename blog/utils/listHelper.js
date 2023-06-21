@@ -12,6 +12,32 @@ const favoriteBlog = (blogs) => {
   });
   return fav;
 };
+const mostBlogs = (blogs) => {
+  if (blogs.length === 0) {
+    return 'Pass in array with atleast one blog';
+  }
+  const authors = [];
+  blogs.forEach((blog) => {
+    let author = authors.find((a) => a.name === blog.author);
+    if (author) {
+      author.blogs += 1;
+    } else {
+      author = {
+        name: blog.author,
+        blogs: 1,
+      };
+      authors.push(author);
+    }
+  });
+  let top = authors[0];
+
+  authors.forEach((author) => {
+    if (top.blogs < author.blogs) {
+      top = author;
+    }
+  });
+  return top;
+};
 module.exports = {
-  dummy, totalLikes, favoriteBlog,
+  dummy, totalLikes, favoriteBlog, mostBlogs,
 };
