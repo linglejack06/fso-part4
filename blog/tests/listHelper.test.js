@@ -101,4 +101,16 @@ describe('most blogs', () => {
     const result = listHelper.mostBlogs([]);
     expect(result).toBe('Pass in array with atleast one blog');
   });
+  test('returns first author that had highest blogs', () => {
+    blogs.push({
+      _id: '5a422b3a1b54a676234d17f9',
+      title: 'Canonical string reduction',
+      author: 'Edsger W. Dijkstra',
+      url: 'http://www.cs.utexas.edu/~EWD/transcriptions/EWD08xx/EWD808.html',
+      likes: 12,
+      __v: 0,
+    });
+    const result = listHelper.mostBlogs(blogs);
+    expect(result).toEqual({ name: 'Edsger W. Dijkstra', blogs: 3 });
+  });
 });
