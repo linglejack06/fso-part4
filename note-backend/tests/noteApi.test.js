@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const { initialNotes, nonExistingId, notesInDb } = require('./testHelper');
+const { initialNotes, notesInDb } = require('./testHelper');
 const app = require('../app');
 const Note = require('../models/note');
 
 const api = supertest(app);
 beforeEach(async () => {
   await Note.deleteMany({});
-  let noteObject = new Note(initialNotes[0]);
-  await noteObject.save();
-  noteObject = new Note(initialNotes[1]);
-  await noteObject.save();
+  const noteObjs = initialNotes.map(async (note) => new Note(note));
+  const promises = noteObjs.map(note => note.save());
+  await Promise.all(promises);
 });
 
 test('notes returned as json', async () => {
@@ -74,7 +73,7 @@ test('Note can be deleted', async () => {
   expect(notesAtEnd).toHaveLength(initialNotes.length - 1);
   const contents = notesAtEnd.map(n => n.content);
   expect(contents).not.toContain(noteToDelete.content);
-})
+});
 afterAll(async () => {
   await mongoose.connection.close();
 });
