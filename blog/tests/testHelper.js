@@ -29,7 +29,7 @@ const blogsInDb = async () => {
 const initializeDb = async () => {
   await Blog.deleteMany({});
   const blogs = initialBlogs.map((blog) => new Blog(blog));
-  const promises = blogs.forEach((blog) => blog.save());
+  const promises = blogs.map((blog) => blog.save());
   await Promise.all(promises);
 };
 const closeDb = async () => {
