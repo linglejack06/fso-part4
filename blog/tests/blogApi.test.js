@@ -1,7 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-extraneous-dependencies */
 const supertest = require('supertest');
-const Blog = require('../models/blog');
 const app = require('../app');
 const {
   initialBlogs, blogsInDb, initializeDb, closeDb,
@@ -12,7 +11,7 @@ const api = supertest(app);
 beforeEach(async () => {
   await initializeDb();
 });
-describe('GET routes', () => {
+describe('GET route', () => {
   test('blogs are returned as JSON', async () => {
     await api
       .get('/api/blogs')
