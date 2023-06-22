@@ -55,6 +55,26 @@ test('Invalid note is not saved to database', async () => {
   const notesAtEnd = await notesInDb();
   expect(notesAtEnd).toHaveLength(initialNotes.length);
 });
+test('Note in database can be found', async () => {
+  const notesAtStart = await notesInDb();
+  const noteToView = notesAtStart[0];
+  const resultNote = await api
+    .get(`/api/notes/${noteToView.id}`)
+    .expect(200)
+    .expect('Content-Type', /application\/json/);
+  expect(resultNote.body).toEqual(noteToView);
+});
+test('Note can be deleted', async () => {
+  const notesAtStart = await notesInDb();
+  const noteToDelete = notesAtStart[0];
+  await api
+    .delete(`/api/notes/${noteToDelete.id}`)
+    .expect(204);
+  const notesAtEnd = await notesInDb();
+  expect(notesAtEnd).toHaveLength(initialNotes.length - 1);
+  const contents = notesAtEnd.map(n => n.content);
+  expect(contents).not.toContain(noteToDelete.content);
+})
 afterAll(async () => {
   await mongoose.connection.close();
 });
