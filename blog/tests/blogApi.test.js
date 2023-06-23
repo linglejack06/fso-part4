@@ -91,8 +91,22 @@ describe('DELETE route', () => {
   });
 });
 describe('PUT route', () => {
-  
-})
+  test('number of likes is updated', async () => {
+    const originalBlogs = await blogsInDb();
+    await api
+      .put(`/api/blogs/${originalBlogs[0].id}`)
+      .send({
+        likes: 3,
+      })
+      .expect(200);
+    const updatedBlogs = await blogsInDb();
+    expect(updatedBlogs[0].likes).toBe(3);
+    expect(updatedBlogs[0]).toEqual({
+      ...originalBlogs[0],
+      likes: 3,
+    });
+  });
+});
 afterAll(async () => {
   await closeDb();
 });
