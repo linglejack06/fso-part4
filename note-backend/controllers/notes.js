@@ -1,6 +1,6 @@
 const notesRouter = require('express').Router();
-const note = require('../models/note');
 const Note = require('../models/note');
+const User = require('../models/user');
 
 notesRouter.get('/', async (req, res) => {
   const notes = await Note.find({});
@@ -15,22 +15,26 @@ notesRouter.get('/:id', async (req, res) => {
   }
 });
 notesRouter.delete('/:id', async (req, res) => {
-  await note.findByIdAndRemove(req.params.id);
+  await Note.findByIdAndRemove(req.params.id);
   res.status(204).end();
 });
 notesRouter.post('/', async (req, res) => {
   const { body } = req;
+  const user = await User.findById(body.userId);
 
   const note = new Note({
     content: body.content,
     important: body.important || false,
+    user: user.id,
   });
   const savedNote = await note.save();
+  user.notes = user.notes.concat(savedNote.id);
+  await user.save();
   res.status(201).json(savedNote);
 });
 notesRouter.put('/:id', (req, res) => {
   const { content, important } = req.body;
-  Note.findByIdAndRemove(
+  Note.findByIdAndUpdate(
     req.params.id,
     { content, important },
     { new: true, runValidators: true, context: 'query' },

@@ -55,7 +55,7 @@ describe('GET route', () => {
       .get('/api/users')
       .expect(200)
       .expect('Content-Type', /application\/json/);
-  })
+  });
 });
 
 afterAll(() => {
