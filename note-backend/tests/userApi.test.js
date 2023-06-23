@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const supertest = require('supertest');
+const mongoose = require('mongoose');
 const app = require('../app');
 const { usersInDb } = require('./testHelper');
 
@@ -43,8 +44,20 @@ describe('POST route', () => {
       .send(newUser)
       .expect(400)
       .expect('Content-Type', /application\/json/);
-    expect(result.body.error).tocontain('expected `username` to be unique');
+    expect(result.body.error).toContain('expected `username` to be unique');
     const usersAtEnd = await usersInDb();
     expect(usersAtEnd).toHaveLength(usersAtStart.length);
+  });
+});
+describe('GET route', () => {
+  test('json is returned', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
   })
+});
+
+afterAll(() => {
+  mongoose.connection.close();
 });
