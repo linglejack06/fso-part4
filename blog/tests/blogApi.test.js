@@ -3,7 +3,7 @@
 const supertest = require('supertest');
 const app = require('../app');
 const {
-  initialBlogs, blogsInDb, initializeDb, closeDb,
+  initialBlogs, blogsInDb, nonExistingId, initializeDb, closeDb,
 } = require('./testHelper');
 
 const api = supertest(app);
@@ -79,7 +79,20 @@ describe('POST route', () => {
       .expect(400);
   });
 });
-
+describe('DELETE route', () => {
+  test('existing blog is deleted', async () => {
+    const initialBlogsInDb = await blogsInDb();
+    await api
+      .delete(`/api/blogs/${initialBlogsInDb[0].id}`)
+      .expect(204);
+    const finalBlogsInDb = await blogsInDb();
+    const titles = finalBlogsInDb.map((blog) => blog.title);
+    expect(titles).not.toContain(initialBlogsInDb[0].title);
+  });
+});
+describe('PUT route', () => {
+  
+})
 afterAll(async () => {
   await closeDb();
 });

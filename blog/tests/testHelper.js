@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 const mongoose = require('mongoose');
 const Blog = require('../models/blog');
 
@@ -25,7 +26,17 @@ const blogsInDb = async () => {
   const blogs = await Blog.find({});
   return blogs.map((blog) => blog.toJSON());
 };
-
+const nonExistingId = async () => {
+  const blog = new Blog({
+    title: 'how earth changed',
+    author: 'black',
+    url: 'www.bing.com',
+    likes: 4,
+  });
+  await blog.save();
+  await blog.deleteOne();
+  return blog._id.toString();
+};
 const initializeDb = async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(initialBlogs);
@@ -35,5 +46,5 @@ const closeDb = async () => {
 };
 
 module.exports = {
-  initialBlogs, blogsInDb, initializeDb, closeDb,
+  initialBlogs, blogsInDb, nonExistingId, initializeDb, closeDb,
 };
