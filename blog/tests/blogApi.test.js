@@ -3,7 +3,7 @@
 const supertest = require('supertest');
 const app = require('../app');
 const {
-  initialBlogs, blogsInDb, nonExistingId, initializeDb, closeDb,
+  initialBlogs, blogsInDb, initializeDb, closeDb,
 } = require('./testHelper');
 
 const api = supertest(app);
