@@ -1,6 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 const mongoose = require('mongoose');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 const initialBlogs = [
   {
@@ -22,9 +23,25 @@ const initialBlogs = [
     likes: 23,
   },
 ];
+const initialUsers = [
+  {
+    username: 'jling',
+    passwordHash: 'fake',
+    name: 'Jack Lingle',
+  },
+  {
+    username: 'jaycas',
+    passwordHash: 'fake2',
+    name: 'Jayden Cassady',
+  },
+];
 const blogsInDb = async () => {
   const blogs = await Blog.find({});
   return blogs.map((blog) => blog.toJSON());
+};
+const usersInDb = async () => {
+  const users = await User.find({});
+  return users.map((user) => user.toJSON());
 };
 const nonExistingId = async () => {
   const blog = new Blog({
@@ -40,11 +57,13 @@ const nonExistingId = async () => {
 const initializeDb = async () => {
   await Blog.deleteMany({});
   await Blog.insertMany(initialBlogs);
+  await User.deleteMany({});
+  await User.insertMany(initialUsers);
 };
 const closeDb = async () => {
   await mongoose.connection.close();
 };
 
 module.exports = {
-  initialBlogs, blogsInDb, nonExistingId, initializeDb, closeDb,
+  initialBlogs, initialUsers, blogsInDb, usersInDb, nonExistingId, initializeDb, closeDb,
 };
