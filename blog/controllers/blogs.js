@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-underscore-dangle */
 const blogRouter = require('express').Router();
 const jwt = require('jsonwebtoken');
@@ -37,9 +38,9 @@ blogRouter.post('/', async (req, res, next) => {
     const user = await User.findById(decodedUser.id);
     user.blogs = [...user.blogs, savedBlog._id];
     await user.save();
-    res.status(201).json(savedBlog);
+    return res.status(201).json(savedBlog);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 blogRouter.delete('/:id', async (req, res, next) => {
