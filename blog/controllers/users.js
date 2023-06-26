@@ -18,5 +18,13 @@ usersRouter.post('/', async (req, res, next) => {
     next(error);
   }
 });
-
+usersRouter.get('/', async (req, res, next) => {
+  try {
+    const users = await User.find({});
+    console.log(users);
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
 module.exports = usersRouter;

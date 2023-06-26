@@ -60,6 +60,18 @@ describe('POST routes', () => {
     expect(users).toHaveLength(initialUsers.length);
   });
 });
+describe('GET routes', () => {
+  test('List of users is returned as json', async () => {
+    await api
+      .get('/api/users')
+      .expect(200)
+      .expect('Content-Type', /application\/json/);
+  });
+  test('Correct number of users is returned', async () => {
+    const response = await api.get('/api/users');
+    expect(response.body).toHaveLength(initialUsers.length);
+  });
+});
 
 afterAll(async () => {
   await closeDb();
