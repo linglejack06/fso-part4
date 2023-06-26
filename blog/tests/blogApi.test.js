@@ -1,9 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-extraneous-dependencies */
 const supertest = require('supertest');
+const jwt = require('jsonwebtoken');
 const app = require('../app');
+const Blog = require('../models/blog');
 const {
-  initialBlogs, blogsInDb, initializeDb, closeDb,
+  initialBlogs, blogsInDb, initializeDb, closeDb, usersInDb,
 } = require('./testHelper');
 
 const api = supertest(app);
@@ -37,9 +39,15 @@ describe('POST route', () => {
       url: 'www.ling.com/hungry-earth',
       likes: 34,
     };
+    const users = await usersInDb();
+    const token = jwt.sign(
+      { username: users[0].username, id: users[0].id },
+      process.env.SECRET,
+    );
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set({ Authorization: `Bearer ${token}` })
       .expect(201);
     const blogs = await blogsInDb();
     expect(blogs).toHaveLength(initialBlogs.length + 1);
@@ -52,7 +60,12 @@ describe('POST route', () => {
       title: 'How earth became hungry',
       url: 'www.ling.com/hungry-earth',
     };
-    await api.post('/api/blogs').send(newBlog);
+    const users = await usersInDb();
+    const token = jwt.sign(
+      { username: users[0].username, id: users[0].id },
+      process.env.SECRET,
+    );
+    await api.post('/api/blogs').send(newBlog).set({ Authorization: `Bearer ${token}` });
     const blogs = await blogsInDb();
     expect(blogs[blogs.length - 1].likes).toBe(0);
   });
@@ -62,9 +75,15 @@ describe('POST route', () => {
       author: 'jack',
       likes: 4,
     };
+    const users = await usersInDb();
+    const token = jwt.sign(
+      { username: users[0].username, id: users[0].id },
+      process.env.SECRET,
+    );
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set({ Authorization: `Bearer ${token}` })
       .expect(400);
   });
   test('title property missing causes 400 error', async () => {
@@ -73,21 +92,49 @@ describe('POST route', () => {
       url: 'www.ling.com',
       likes: 400005,
     };
+    const users = await usersInDb();
+    const token = jwt.sign(
+      { username: users[0].username, id: users[0].id },
+      process.env.SECRET,
+    );
     await api
       .post('/api/blogs')
       .send(newBlog)
+      .set({ Authorization: `Bearer ${token}` })
       .expect(400);
   });
 });
 describe('DELETE route', () => {
   test('existing blog is deleted', async () => {
     const initialBlogsInDb = await blogsInDb();
+    const initialBlog = initialBlogsInDb[0];
+    const users = await usersInDb();
+    await Blog.findByIdAndUpdate(initialBlog.id, { user: users[0].id });
+    const token = jwt.sign(
+      { username: users[0].username, id: users[0].id },
+      process.env.SECRET,
+    );
     await api
       .delete(`/api/blogs/${initialBlogsInDb[0].id}`)
+      .set({ Authorization: `Bearer ${token}` })
       .expect(204);
     const finalBlogsInDb = await blogsInDb();
     const titles = finalBlogsInDb.map((blog) => blog.title);
     expect(titles).not.toContain(initialBlogsInDb[0].title);
+  });
+  test('unauthorized user cannot delete blog', async () => {
+    const initialBlogsInDb = await blogsInDb();
+    const initialBlog = initialBlogsInDb[0];
+    const users = await usersInDb();
+    await Blog.findByIdAndUpdate(initialBlog.id, { user: users[0].id });
+    const token = jwt.sign(
+      { username: users[1].username, id: users[1].id },
+      process.env.SECRET,
+    );
+    await api
+      .delete(`/api/blogs/${initialBlogsInDb[0].id}`)
+      .set({ Authorization: `Bearer ${token}` })
+      .expect(401);
   });
 });
 describe('PUT route', () => {

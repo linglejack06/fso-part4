@@ -1,9 +1,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-underscore-dangle */
 const blogRouter = require('express').Router();
-const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
-const User = require('../models/user');
+const { userExtractor } = require('../utils/middleware');
 
 blogRouter.get('/', async (req, res, next) => {
   try {
@@ -13,7 +12,7 @@ blogRouter.get('/', async (req, res, next) => {
     next(error);
   }
 });
-blogRouter.post('/', async (req, res, next) => {
+blogRouter.post('/', userExtractor, async (req, res, next) => {
   const { user } = req;
   try {
     let author;
@@ -37,7 +36,7 @@ blogRouter.post('/', async (req, res, next) => {
     return next(error);
   }
 });
-blogRouter.delete('/:id', async (req, res, next) => {
+blogRouter.delete('/:id', userExtractor, async (req, res, next) => {
   const { user } = req;
   try {
     const blog = await Blog.findById(req.params.id);
@@ -45,7 +44,7 @@ blogRouter.delete('/:id', async (req, res, next) => {
       await Blog.findByIdAndRemove(blog.id);
       return res.status(204).end();
     }
-    return res.status(400).json({ error: 'User does not have rights to delete blog' });
+    return res.status(401).json({ error: 'User does not have rights to delete blog' });
   } catch (error) {
     return next(error);
   }
