@@ -26,16 +26,23 @@ blogRouter.post('/', async (req, res, next) => {
     if (!decodedUser.id) {
       return res.status(401).json({ error: 'invalid token' });
     }
-    const author = (req.body.author === null) ? decodedUser.name : req.body.author;
+    const user = await User.findById(decodedUser.id);
+    console.log(user);
+    let author;
+    if (req.body.author) {
+      author = req.body.author;
+    } else {
+      author = user.name;
+    }
+    console.log(author);
     const blog = new Blog({
       author,
       title: req.body.title,
       url: req.body.url,
       likes: req.body.likes,
-      user: decodedUser.id,
+      user: user.id,
     });
     const savedBlog = await blog.save();
-    const user = await User.findById(decodedUser.id);
     user.blogs = [...user.blogs, savedBlog._id];
     await user.save();
     return res.status(201).json(savedBlog);
