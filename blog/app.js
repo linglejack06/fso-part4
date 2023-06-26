@@ -2,7 +2,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const errorHandler = require('./utils/middleware');
+const { errorHandler, tokenExtractor } = require('./utils/middleware');
 const { MONGODB_URI } = require('./utils/config');
 const logger = require('./utils/logger');
 const blogRouter = require('./controllers/blogs');
@@ -22,6 +22,7 @@ mongoose.connect(MONGODB_URI)
 
 app.use(cors());
 app.use(express.json());
+app.use(tokenExtractor);
 app.use('/api/blogs', blogRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/login', loginRouter);
