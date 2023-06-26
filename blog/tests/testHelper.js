@@ -28,11 +28,13 @@ const initialUsers = [
     username: 'jling',
     passwordHash: 'fake',
     name: 'Jack Lingle',
+    blogs: [],
   },
   {
     username: 'jaycas',
     passwordHash: 'fake2',
     name: 'Jayden Cassady',
+    blogs: [],
   },
 ];
 const blogsInDb = async () => {

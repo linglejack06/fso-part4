@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 const supertest = require('supertest');
 const app = require('../app');
 const {
@@ -5,10 +6,9 @@ const {
 } = require('./testHelper');
 
 const api = supertest(app);
-
 beforeEach(async () => {
   await initializeDb();
-});
+}, 15000);
 
 describe('POST routes', () => {
   test('User is added to database', async () => {
