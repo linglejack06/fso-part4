@@ -1,7 +1,7 @@
 const supertest = require('supertest');
 const app = require('../app');
 const {
-  initialUsers, usersInDb, initializeDb, closeDb, 
+  initialUsers, usersInDb, initializeDb, closeDb,
 } = require('./testHelper');
 
 const api = supertest(app);
@@ -56,6 +56,33 @@ describe('POST routes', () => {
       .post('/api/users')
       .send(userWithoutUsername)
       .expect(400);
+    const users = await usersInDb();
+    expect(users).toHaveLength(initialUsers.length);
+  });
+  test('password with less than 3 characters fails', async () => {
+    const shortPw = {
+      username: 'jackl',
+      password: 'j',
+    };
+    const response = await api
+      .post('/api/users')
+      .send(shortPw)
+      .expect(400);
+    expect(response.body).toEqual({ error: 'username and password must be atleast 3 characters long' });
+    const users = await usersInDb();
+    expect(users).toHaveLength(initialUsers.length);
+  });
+  test('username with less than 3 characters fails', async () => {
+    const shortUser = {
+      username: 'j',
+      password: 'helloooo',
+    };
+    const response = await api
+      .post('/api/users')
+      .send(shortUser)
+      .expect(400);
+
+    expect(response.body).toEqual({ error: 'username and password must be atleast 3 characters long' });
     const users = await usersInDb();
     expect(users).toHaveLength(initialUsers.length);
   });

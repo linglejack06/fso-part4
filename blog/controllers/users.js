@@ -8,20 +8,21 @@ usersRouter.post('/', async (req, res, next) => {
   const saltRounds = 15;
   if (!password || !username) {
     return res.status(400).json({ error: 'missing username or password' });
+  } if (password.length < 3) {
+    return res.status(400).json({ error: 'username and password must be atleast 3 characters long' });
   }
   try {
     const passwordHash = await bcrypt.hash(password, saltRounds);
     const user = new User({ username, name, passwordHash });
     const savedUser = await user.save();
-    res.status(201).json(savedUser);
+    return res.status(201).json(savedUser);
   } catch (error) {
-    next(error);
+    return next(error);
   }
 });
 usersRouter.get('/', async (req, res, next) => {
   try {
     const users = await User.find({});
-    console.log(users);
     res.json(users);
   } catch (error) {
     next(error);

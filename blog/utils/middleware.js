@@ -6,7 +6,7 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' });
   } if (error.name === 'ValidationError') {
-    return response.status(400).json({ error: error.message });
+    return response.status(400).json({ error: 'username and password must be atleast 3 characters long' });
   }
 
   return next(error);
