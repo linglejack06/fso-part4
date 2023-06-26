@@ -1,4 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
+const jwt = require('jsonwebtoken');
 const logger = require('./logger');
+const User = require('../models/user');
 
 const errorHandler = (error, request, response, next) => {
   logger.error(error.message);
@@ -21,5 +24,14 @@ const tokenExtractor = (req, res, next) => {
   }
   next();
 };
+const userExtractor = async (req, res, next) => {
+  const decodedUser = jwt.verify(req.token, process.env.SECRET);
+  if (!decodedUser.id) {
+    return res.stauts(401).json({ error: 'Invalid Token' });
+  }
+  const user = await User.findById(decodedUser.id);
+  req.user = user;
+  return next();
+};
 
-module.exports = { errorHandler, tokenExtractor };
+module.exports = { errorHandler, tokenExtractor, userExtractor };
