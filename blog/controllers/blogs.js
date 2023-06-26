@@ -1,14 +1,15 @@
 /* eslint-disable no-underscore-dangle */
 const blogRouter = require('express').Router();
+const jwt = require('jsonwebtoken');
 const Blog = require('../models/blog');
 const User = require('../models/user');
 
-const removeBlogFromUser = async (id) => {
-  const blog = await Blog.findById(id);
-  const user = await User.findById(blog.user);
-  const index = user.blogs.indexOf(blog._id);
-  user.blogs = user.blogs.slice(0, index) + user.blogs.slice(index, -1);
-  await user.save();
+const getToken = (request) => {
+  const authorization = request.get('Authorization');
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '');
+  }
+  return null;
 };
 blogRouter.get('/', async (req, res, next) => {
   try {
@@ -19,10 +20,21 @@ blogRouter.get('/', async (req, res, next) => {
   }
 });
 blogRouter.post('/', async (req, res, next) => {
-  const blog = new Blog(req.body);
   try {
+    const decodedUser = jwt.verify(getToken(req), process.env.SECRET);
+    if (!decodedUser.id) {
+      return res.status(401).json({ error: 'invalid token' });
+    }
+    const author = (req.body.author === null) ? decodedUser.name : req.body.author;
+    const blog = new Blog({
+      author,
+      title: req.body.title,
+      url: req.body.url,
+      likes: req.body.likes,
+      user: decodedUser.id,
+    });
     const savedBlog = await blog.save();
-    const user = await User.findById(req.body.user);
+    const user = await User.findById(decodedUser.id);
     user.blogs = [...user.blogs, savedBlog._id];
     await user.save();
     res.status(201).json(savedBlog);
@@ -32,8 +44,7 @@ blogRouter.post('/', async (req, res, next) => {
 });
 blogRouter.delete('/:id', async (req, res, next) => {
   try {
-    await removeBlogFromUser(req.params.id);
-    await Blog.findByIdAndDelete(req.params.id);
+    await Blog.findByIdAndRemove(req.params.id);
     res.status(204).end();
   } catch (error) {
     next(error);
