@@ -6,7 +6,7 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development nodemon index.js",
-    "build:ui": "rm -rf build && cd ../lesson-frontend && npm run build && cp -r build ../lesson-backend/build",
+    "build:ui": "rm -rf build && cd ../../fso-part5/note-frontend && npm run build && cp -r build ../../fso-part4/note-backend/build",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
     "lint": "eslint .",
     "test": "NODE_ENV=test jest --verbose --runInBand",
