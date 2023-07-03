@@ -22,6 +22,7 @@ mongoose.connect(MONGODB_URI)
   });
 
 app.use(cors());
+app.use(express.static('dist'));
 app.use(express.json());
 app.use(tokenExtractor);
 app.use('/api/blogs', blogRouter);
