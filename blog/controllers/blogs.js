@@ -67,11 +67,13 @@ blogRouter.put('/:id', async (req, res, next) => {
   }
 });
 blogRouter.put('/:id/comments', async (req, res, next) => {
-  const { comments } = req.body;
+  const { comment } = req.body;
   try {
+    const blogs = await Blog.find({});
+    const blogToUpdate = blogs.find((blog) => blog.id === req.params.id);
     const updatedBlog = await Blog.findByIdAndUpdate(
       req.params.id,
-      { comments },
+      { comments: [...blogToUpdate.comments, comment] },
       { new: true },
     );
     const populatedBlog = await updatedBlog.populate('user', { username: 1, name: 1 });
