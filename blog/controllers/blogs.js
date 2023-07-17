@@ -71,9 +71,10 @@ blogRouter.put('/:id/comments', async (req, res, next) => {
   try {
     const blogs = await Blog.find({});
     const blogToUpdate = blogs.find((blog) => blog.id === req.params.id);
+    const blogComments = blogToUpdate.comments ? blogToUpdate.comments : [];
     const updatedBlog = await Blog.findByIdAndUpdate(
       req.params.id,
-      { comments: [...blogToUpdate.comments, comment] },
+      { comments: [...blogComments, comment] },
       { new: true },
     );
     const populatedBlog = await updatedBlog.populate('user', { username: 1, name: 1 });
